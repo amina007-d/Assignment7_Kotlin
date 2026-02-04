@@ -15,10 +15,13 @@ import androidx.compose.ui.unit.dp
 import com.example.weather_app.presentation.WeatherViewModel
 import com.example.weather_app.ui.theme.backgroundBrush
 import androidx.compose.ui.zIndex
+import com.example.weather_app.presentation.FavoritesViewModel
+
 @Composable
 fun WeatherScreen(
     viewModel: WeatherViewModel,
-    unit: String
+    unit: String,
+    favoritesViewModel: FavoritesViewModel
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -26,60 +29,70 @@ fun WeatherScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundBrush)
-            .padding(top = 100.dp)
+            .padding(top = 100.dp) // под SearchBar
     ) {
 
-        // 🟡 OFFLINE BANNER
         if (state.isOffline) {
-            Card(
+            Box(
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 8.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF1E293B)
-                ),
-                shape = RoundedCornerShape(16.dp)
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .zIndex(2f),
+                contentAlignment = Alignment.TopCenter
             ) {
-                Text(
-                    text = "Offline mode • showing cached data",
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFF2A3441)
+                    ),
+                    elevation = CardDefaults.cardElevation(6.dp)
+                ) {
+                    Text(
+                        text = "Offline mode • showing cached data",
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
             }
         }
 
-        when {
-            state.isLoading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                    color = Color.White
-                )
-            }
-
-            state.error != null -> {
-                Text(
-                    text = state.error!!,
-                    color = Color.Red,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-
-            state.weather != null -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = if (state.isOffline) 32.dp else 0.dp),
-                    contentAlignment = Alignment.TopCenter
-                ) {
-                    WeatherContent(state = state, unit = unit)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = if (state.isOffline) 36.dp else 0.dp)
+        ) {
+            when {
+                state.isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Color.White
+                    )
                 }
-            }
 
-            else -> EmptyState()
+                state.error != null -> {
+                    Text(
+                        text = state.error ?: "",
+                        color = Color.Red,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
+                state.weather != null -> {
+                    WeatherContent(
+                        state = state,
+                        unit = unit,
+                        favoritesViewModel = favoritesViewModel
+                    )
+                }
+
+                else -> EmptyState()
+            }
         }
     }
 }
+
+
 
 
 

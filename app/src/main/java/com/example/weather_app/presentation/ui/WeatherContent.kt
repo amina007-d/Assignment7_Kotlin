@@ -4,10 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,15 +15,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weather_app.domain.util.cToF
-import com.example.weather_app.presentation.state.WeatherUiState
 import com.example.weather_app.domain.util.formatLastUpdate
+import com.example.weather_app.presentation.FavoritesViewModel
+import com.example.weather_app.presentation.state.WeatherUiState
 
 @Composable
 fun WeatherContent(
     state: WeatherUiState,
-    unit: String
+    unit: String,
+    favoritesViewModel: FavoritesViewModel
 ) {
     val weather = state.weather ?: return
+
+    var showDialog by remember { mutableStateOf(false) }
+    var note by remember { mutableStateOf("") }
+    var errorText by remember { mutableStateOf<String?>(null) }
 
     GlassCard(
         modifier = Modifier
@@ -31,20 +37,36 @@ fun WeatherContent(
             .padding(16.dp)
     ) {
 
-        Text(
-            text = weather.city,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.White
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = weather.city,
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White
+                )
+
+                Text(
+                    text = "Last update: ${formatLastUpdate(weather.lastUpdate)}",
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 12.sp
+                )
+            }
+
+            IconButton(onClick = { showDialog = true }) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Add to favorites",
+                    tint = Color.White
+                )
+            }
+        }
 
         Spacer(Modifier.height(12.dp))
-
-        Text(
-            text = "Last update: ${formatLastUpdate(weather.lastUpdate)}",
-            color = Color.White.copy(alpha = 0.6f),
-            fontSize = 12.sp
-        )
 
         val temp =
             if (unit == "F") cToF(weather.temperature) else weather.temperature
@@ -85,6 +107,66 @@ fun WeatherContent(
                 )
             }
         }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+                errorText = null
+            },
+            confirmButton = {
+                Button(onClick = {
+                    if (note.isBlank()) {
+                        errorText = "Note cannot be empty"
+                    } else {
+                        favoritesViewModel.addFavorite(
+                            title = weather.city,
+                            note = note,
+                            lat = weather.lat,
+                            lon = weather.lon
+                        )
+                        note = ""
+                        errorText = null
+                        showDialog = false
+                    }
+                }) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    showDialog = false
+                    errorText = null
+                }) {
+                    Text("Cancel")
+                }
+            },
+            title = {
+                Text("Add note for ${weather.city}")
+            },
+            text = {
+                Column {
+                    TextField(
+                        value = note,
+                        onValueChange = {
+                            note = it
+                            errorText = null
+                        },
+                        placeholder = { Text("Enter note") }
+                    )
+
+                    errorText?.let {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = it,
+                            color = Color.Red,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+            }
+        )
     }
 }
 
@@ -133,5 +215,3 @@ fun GlassCard(
         Column(modifier = Modifier.padding(24.dp), content = content)
     }
 }
-
-

@@ -3,6 +3,7 @@ package com.example.weather_app.presentation.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,12 +17,14 @@ import androidx.compose.ui.zIndex
 import com.example.weather_app.presentation.SearchViewModel
 import com.example.weather_app.presentation.SettingsViewModel
 import com.example.weather_app.presentation.WeatherViewModel
-
+import com.example.weather_app.presentation.FavoritesViewModel
 @Composable
 fun MainScreen(
     weatherViewModel: WeatherViewModel,
     searchViewModel: SearchViewModel,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    favoritesViewModel: FavoritesViewModel,
+    onOpenFavorites: () -> Unit   // ✅ NEW
 ) {
     val cities by searchViewModel.cities.collectAsState()
     val unit by settingsViewModel.unit.collectAsState()
@@ -30,13 +33,14 @@ fun MainScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // 🌤 Weather content
+
         WeatherScreen(
             viewModel = weatherViewModel,
-            unit = unit
+            unit = unit,
+            favoritesViewModel = favoritesViewModel
         )
 
-        // 🔍 SEARCH BAR + ⚙️ BUTTON (в одной строке)
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -54,6 +58,16 @@ fun MainScreen(
                     onSearch = searchViewModel::search
                 )
 
+
+                IconButton(onClick = onOpenFavorites) {
+                    Icon(
+                        imageVector = Icons.Filled.Favorite,
+                        contentDescription = "Favorites",
+                        tint = Color.White
+                    )
+                }
+
+
                 IconButton(onClick = { showSettings = true }) {
                     Icon(
                         imageVector = Icons.Filled.Settings,
@@ -63,7 +77,7 @@ fun MainScreen(
                 }
             }
 
-            // ✅ ERROR MESSAGE (graceful UI)
+
             error?.let {
                 Text(
                     text = it,
@@ -88,7 +102,6 @@ fun MainScreen(
         }
 
 
-        // ⚙️ SETTINGS OVERLAY
         if (showSettings) {
             SettingsOverlay(
                 viewModel = settingsViewModel,
@@ -97,4 +110,3 @@ fun MainScreen(
         }
     }
 }
-

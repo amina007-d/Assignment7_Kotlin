@@ -32,7 +32,7 @@ fun SettingsOverlay(
                 .align(Alignment.Center)
                 .fillMaxWidth(0.9f),
             shape = RoundedCornerShape(24.dp),
-            color = Color(0xFF1E293B) // вместо чёрного
+            color = Color(0xFF1E293B)
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
                 Row(

@@ -28,6 +28,8 @@ class WeatherRepositoryImpl(
 
             val weather = Weather(
                 city = city,
+                lat = lat,
+                lon = lon,
                 temperature = response.current_weather.temperature,
                 feelsLike = response.current_weather.temperature,
                 humidity = response.hourly.relativehumidity_2m.first(),

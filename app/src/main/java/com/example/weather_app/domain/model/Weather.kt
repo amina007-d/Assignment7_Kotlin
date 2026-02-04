@@ -1,7 +1,8 @@
 package com.example.weather_app.domain.model
-
 data class Weather(
     val city: String,
+    val lat: Double,
+    val lon: Double,
     val temperature: Double,
     val feelsLike: Double,
     val humidity: Int,
@@ -15,3 +16,4 @@ data class HourlyWeather(
     val time: String,
     val temperature: Double
 )
+
