@@ -133,6 +133,62 @@ This helps users understand when the data was fetched from the API or loaded fro
 - Limited accessibility support (no screen reader optimization)
 
 ---
+## Firebase Integration
+
+The application is integrated with **Firebase Realtime Database** to store user-specific favorite cities.  
+Firebase is used to demonstrate authentication, real-time data synchronization, CRUD operations, and basic security rules.
+
+### Firebase Product
+- **Firebase Realtime Database**
+- **Firebase Authentication (Anonymous)**
+
+Firestore is not used.
+
+---
+
+## Authentication
+
+The app uses **Firebase Anonymous Authentication**.
+
+- Authentication is initialized at app startup
+- Each user is assigned a unique Firebase `uid`
+- No registration or login UI is required
+- Firebase-dependent logic is executed only after authentication is completed
+
+This ensures that each user can securely access only their own data.
+
+---
+
+## Favorites Feature (Firebase)
+
+Each authenticated user has a personal list of favorite cities stored in Firebase.
+
+### Supported operations:
+- Add a city to favorites
+- Add or edit a short note for each city (e.g., *"Take umbrella"*)
+- Delete a favorite city
+- View favorites in real time
+- *(Optional)* Display current weather for favorite cities using the existing Weather API
+
+Favorites are updated automatically in the UI when data changes in Firebase, without requiring manual refresh.
+
+---
+
+## Data Model (Firebase)
+
+Each favorite city stored in Firebase contains the following fields:
+
+```json
+{
+  "id": "string",
+  "title": "string",
+  "note": "string",
+  "lat": number,
+  "lon": number,
+  "createdAt": number,
+  "createdBy": "uid"
+}
+```
 
 ## Summary
 
