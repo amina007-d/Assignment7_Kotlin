@@ -37,8 +37,10 @@ class FavoritesViewModel(
             note = note,
             lat = lat,
             lon = lon,
-            createdAt = System.currentTimeMillis()
+            createdAt = System.currentTimeMillis(),
+            createdBy = userId
         )
+
 
         repo.addFavorite(userId, city)
     }
